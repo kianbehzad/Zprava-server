@@ -1,0 +1,42 @@
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from .models import Users
+import random
+
+# Create your views here.
+
+def registration(request):
+    username = request.GET.get("username")
+    password = request.GET.get("password")
+    email = request.GET.get("email")
+    if not username or not password or not email:
+        return HttpResponse("Incomplete")
+    username_exist = False
+    email_exist = False
+    for user in Users.objects.all():
+        if user.username == username:
+            username_exist = True
+        if user.email == email:
+            email_exist = True
+    if username_exist and email_exist:
+        return HttpResponse("BothExist")
+    elif username_exist:
+        return HttpResponse("UsernameExist")
+    elif email_exist:
+        return HttpResponse("EmailExist")
+    else:
+        verification_code = random.randint(10000, 99999)
+        user = Users(username=username, password=password, email=email, verification_code=verification_code, is_verified=False)
+        send_mail(
+            'Zprava Verification Code',
+            'you Zprava verification code is: '+ str(verification_code),
+            'kian.behzad@gmail.com',
+            [user.email],
+            fail_silently=True,
+        )
+        user.save()
+        return HttpResponse("pre_verified")
+
+def hello(request):
+    return HttpResponse("hello back")
