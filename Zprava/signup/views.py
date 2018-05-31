@@ -40,3 +40,26 @@ def registration(request):
 
 def hello(request):
     return HttpResponse("hello back")
+
+def verification(request):
+    username = request.GET.get("username")
+    verification_code = request.GET.get("verification_code")
+    if not username or not verification_code:
+        return HttpResponse("Incomplete")
+    username_exist = False
+    is_code_correct = False
+    for user in Users.objects.all():
+        if user.username == username:
+            username_exist = True
+            if user.verification_code == verification_code:
+                user.is_verified = True
+                user.save()
+                is_code_correct = True
+    if not username_exist:
+        return HttpResponse("InvalidUsername")
+    elif not is_code_correct:
+        return HttpResponse("InvalidCode")
+    else:
+        return HttpResponse("Enter")
+
+
