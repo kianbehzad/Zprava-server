@@ -33,8 +33,10 @@ def registration(request):
             'you Zprava verification code is: '+ str(verification_code),
             'kian.behzad@gmail.com',
             [user.email],
-            fail_silently=False,
+            fail_silently=True,
         )
         user.save()
         return HttpResponse("pre_verified")
 
+def hello(request):
+    return HttpResponse("hello back")
