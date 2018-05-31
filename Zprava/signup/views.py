@@ -62,4 +62,23 @@ def verification(request):
     else:
         return HttpResponse("Enter")
 
+def forget(request):
+    email = request.GET.get("email")
+    if not email:
+        return HttpResponse("Incomplete")
+    email_exist = False
+    for user in Users.objects.all():
+        if user.email == email:
+            send_mail(
+                'Zprava Restore Your Data',
+                'your Zprava username is: ' + user.username + '    -    and your password is: ' + user.password,
+                'kian.behzad@gmail.com',
+                [user.email],
+                fail_silently=True,
+            )
+            email_exist = True
+    if not email_exist:
+        return HttpResponse("InvalidEmail")
+    else:
+        return HttpResponse("Sent")
 
