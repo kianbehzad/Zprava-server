@@ -7,12 +7,13 @@ from .models import Chat, TextMessage
 from .serializer import TextMessageSerializer
 from signup.models import Users
 from rest_framework.decorators import api_view
+import datetime
 
 
 # Create your views here.
 
 @api_view(['GET', 'POST', ])
-def getchats(request):
+def getallchats(request):
     username = request.GET.get("username")
     user = None
     is_exist = False
@@ -21,21 +22,64 @@ def getchats(request):
             is_exist = True
             user = _user
     if not is_exist:
-        return HttpResponse('NotExist')
-    #user1.second_set.all()[0].textmessage_set.all()
+        return HttpResponse('InvalidUserName')
     data = {}
-    for chat in user.second_chat_set.all():
-            serializer = TextMessageSerializer(chat.textmessage_set.all(), many=True)
-            data[chat.first_side.username] = serializer.data
-    for chat in user.first_chat_set.all():
-            serializer = TextMessageSerializer(chat.textmessage_set.all(), many=True)
-            data[chat.second_side.username] = serializer.data
-
-    #user_send_messages = Users.objects.all()[0].sender_textmessage_set.all()
-    #serializer = TextMessageSerializer(user_send_messages, many=True)
+    has_any_message = False
+    for chat in user.second_side_chats.all():
+        serializer = TextMessageSerializer(chat.chat_text_messages.all(), many=True)
+        data[chat.first_side.username] = serializer.data
+        has_any_message = True
+    for chat in user.first_side_chats.all():
+        serializer = TextMessageSerializer(chat.chat_text_messages.all(), many=True)
+        data[chat.second_side.username] = serializer.data
+        has_any_message = True
+    if not has_any_message:
+        return HttpResponse('EmptyMessages')
     return Response(data)
 
-def textmessage(request):
+
+@api_view(['GET', 'POST', ])
+def getnewchats(request):
+    username = request.GET.get("username")
+    user = None
+    is_exist = False
+    for _user in Users.objects.all():
+        if _user.username == username:
+            is_exist = True
+            user = _user
+    if not is_exist:
+        return HttpResponse('InvalidUserName')
+    data = {}
+    has_any_message = False
+    has_new_message = False
+    for chat in user.second_side_chats.all():
+        new_messages = []
+        for message in chat.chat_text_messages.all():
+            if not message.is_seen:
+                has_new_message = True
+                new_messages.append(message)
+        if has_new_message:
+            serializer = TextMessageSerializer(new_messages, many=True)
+            data[chat.first_side.username] = serializer.data
+        has_any_message = True
+    for chat in user.first_side_chats.all():
+        new_messages = []
+        for message in chat.chat_text_messages.all():
+            if not message.is_seen:
+                has_new_message = True
+                new_messages.append(message)
+        if has_new_message:
+            serializer = TextMessageSerializer(new_messages, many=True)
+            data[chat.second_side.username] = serializer.data
+        has_any_message = True
+    if not has_any_message:
+        return HttpResponse('EmptyMessages')
+    if not has_new_message:
+        return HttpResponse('NoNewMessages')
+    return Response(data)
+
+
+def newtextmessage(request):
     publisher = request.GET.get("publisher")
     subscriber = request.GET.get("subscriber")
     textmessage = request.GET.get("textmessage")
@@ -51,11 +95,11 @@ def textmessage(request):
             is_subscriber_exists = True
             user_subscriber = _user
     if not is_publisher_exist and not is_publisher_exist:
-        return HttpResponse('NoPublisherSubscriber')
+        return HttpResponse('InvalidPublisherSubscriber')
     if not is_publisher_exist:
-        return HttpResponse('NoPublisher')
+        return HttpResponse('InvalidPublisher')
     if not is_subscriber_exists:
-        return HttpResponse('NoSubscriber')
+        return HttpResponse('InvalidSubscriber')
     chat = None
     chat_exist = False
     for _chat in Chat.objects.all():
@@ -70,13 +114,31 @@ def textmessage(request):
     if not chat_exist:
         chat = Chat(first_side=user_publisher, second_side=user_subscriber)
         chat.save()
-    textmessage = TextMessage(publisher = user_publisher, subscriber = user_subscriber, chat = chat, text = textmessage)
+    textmessage = TextMessage(publisher = user_publisher, subscriber = user_subscriber, chat = chat, text = textmessage, is_seen = False, datetime = datetime.datetime.now())
     textmessage.save()
     return HttpResponse("TextMessageCreated")
 
 
 
-
+def seen(request):
+    firstside = request.GET.get("firstside")
+    secondside = request.GET.get("secondside")
+    chat = None
+    is_chat_exists = False
+    for _chat in Chat.objects.all():
+        if _chat.first_side.username == firstside and _chat.second_side.username == secondside:
+            chat = _chat
+            is_chat_exists = True
+        if _chat.first_side.username == secondside and _chat.second_side.username == firstside:
+            chat = _chat
+            is_chat_exists = True
+    if not is_chat_exists:
+        return HttpResponse('InvalidChat')
+    ##else
+    for textmessage in chat.chat_text_messages.all():
+        textmessage.is_seen = True
+        textmessage.save()
+    return HttpResponse('Seen')
 
 
 
