@@ -117,7 +117,9 @@ def newtextmessage(request):
         chat = Chat(first_side=user_publisher, second_side=user_subscriber)
         chat.save()
     textmessage = TextMessage(publisher = user_publisher, subscriber = user_subscriber, chat = chat, text = textmessage, is_seen = False, datetime = datetime.datetime.now())
+    user_publisher.last_message_datetime = textmessage.datetime
     textmessage.save()
+    user_publisher.save()
     return HttpResponse("TextMessageCreated")
 
 
