@@ -12,6 +12,7 @@ import datetime
 
 # Create your views here.
 
+##http://127.0.0.1:8000/chat/getallchats/?username=amirbayat98
 @api_view(['GET', 'POST', ])
 def getallchats(request):
     username = request.GET.get("username")
@@ -79,6 +80,7 @@ def getnewchats(request):
     return Response(data)
 
 
+##http://127.0.0.1:8000/chat/newtextmessage/?publisher=bn.warcraft&subscriber=amirbayat98&textmessage=new+msg
 def newtextmessage(request):
     publisher = request.GET.get("publisher")
     subscriber = request.GET.get("subscriber")
@@ -120,24 +122,26 @@ def newtextmessage(request):
 
 
 
+##http://127.0.0.1:8000/chat/seen/?whoami=amirbayat98&secondside=bn.warcraft
 def seen(request):
-    firstside = request.GET.get("firstside")
+    whoami = request.GET.get("whoami")
     secondside = request.GET.get("secondside")
     chat = None
     is_chat_exists = False
     for _chat in Chat.objects.all():
-        if _chat.first_side.username == firstside and _chat.second_side.username == secondside:
+        if _chat.first_side.username == whoami and _chat.second_side.username == secondside:
             chat = _chat
             is_chat_exists = True
-        if _chat.first_side.username == secondside and _chat.second_side.username == firstside:
+        if _chat.first_side.username == secondside and _chat.second_side.username == whoami:
             chat = _chat
             is_chat_exists = True
     if not is_chat_exists:
         return HttpResponse('InvalidChat')
     ##else
     for textmessage in chat.chat_text_messages.all():
-        textmessage.is_seen = True
-        textmessage.save()
+        if textmessage.publisher.username == secondside:
+            textmessage.is_seen = True
+            textmessage.save()
     return HttpResponse('Seen')
 
 
