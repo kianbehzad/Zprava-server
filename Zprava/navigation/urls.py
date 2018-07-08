@@ -6,6 +6,7 @@ app_name = "navigation"
 
 urlpatterns = [
     path('userdata/', views.userdata, name='userdata'),
+    path('search/', views.search, name='search'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
