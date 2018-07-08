@@ -10,4 +10,4 @@ class TextMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TextMessage
-        fields = ['publisher', 'subscriber', 'datetime', 'is_seen', 'text', 'pk']
+        fields = ['publisher', 'subscriber', 'datetime', 'is_seen', 'text', 'type', 'pk']

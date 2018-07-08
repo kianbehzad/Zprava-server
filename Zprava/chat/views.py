@@ -27,12 +27,18 @@ def getallchats(request):
     data = {}
     has_any_message = False
     for chat in user.second_side_chats.all():
-        serializer = TextMessageSerializer(chat.chat_text_messages.all(), many=True)
-        data[chat.first_side.username] = serializer.data
+        dict = {}
+        for x in chat.chat_text_messages.all():
+            serializer = TextMessageSerializer(x, many=False)
+            dict[x.pk] = serializer.data
+        data[chat.first_side.username] = dict
         has_any_message = True
     for chat in user.first_side_chats.all():
-        serializer = TextMessageSerializer(chat.chat_text_messages.all(), many=True)
-        data[chat.second_side.username] = serializer.data
+        dict = {}
+        for x in chat.chat_text_messages.all():
+            serializer = TextMessageSerializer(x, many=False)
+            dict[x.pk] = serializer.data
+        data[chat.first_side.username] = dict
         has_any_message = True
     if not has_any_message:
         return HttpResponse('EmptyMessages')
@@ -60,8 +66,11 @@ def getnewchats(request):
                 has_new_message = True
                 new_messages.append(message)
         if has_new_message:
-            serializer = TextMessageSerializer(new_messages, many=True)
-            data[chat.first_side.username] = serializer.data
+            dict = {}
+            for x in new_messages:
+                serializer = TextMessageSerializer(x, many=False)
+                dict[x.pk] = serializer.data
+            data[chat.first_side.username] = dict
         has_any_message = True
     for chat in user.first_side_chats.all():
         new_messages = []
@@ -70,8 +79,11 @@ def getnewchats(request):
                 has_new_message = True
                 new_messages.append(message)
         if has_new_message:
-            serializer = TextMessageSerializer(new_messages, many=True)
-            data[chat.second_side.username] = serializer.data
+            dict = {}
+            for x in new_messages:
+                serializer = TextMessageSerializer(x, many=False)
+                dict[x.pk] = serializer.data
+            data[chat.first_side.username] = dict
         has_any_message = True
     if not has_any_message:
         return HttpResponse('EmptyMessages')
@@ -116,7 +128,7 @@ def newtextmessage(request):
     if not chat_exist:
         chat = Chat(first_side=user_publisher, second_side=user_subscriber)
         chat.save()
-    textmessage = TextMessage(publisher = user_publisher, subscriber = user_subscriber, chat = chat, text = textmessage, is_seen = False, datetime = datetime.datetime.now())
+    textmessage = TextMessage(publisher = user_publisher, subscriber = user_subscriber, chat = chat, text = textmessage, is_seen = False, datetime = datetime.datetime.now(), type="text")
     user_publisher.last_message_datetime = textmessage.datetime
     textmessage.save()
     user_publisher.save()
