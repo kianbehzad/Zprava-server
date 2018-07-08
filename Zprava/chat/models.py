@@ -19,7 +19,7 @@ class TextMessage(models.Model):
     is_seen = models.BooleanField(default=False)
     datetime = models.CharField(max_length=50, null=True)
     text = models.CharField(max_length=1000)
-    type = models.CharField(max_length=50, null=True)#text-...
+    type = models.CharField(max_length=50, null=True)#TEXT-PHOTO-AUDIO-VIDEO
 
 
     def __str__(self):
