@@ -31,7 +31,8 @@ def search(request):
     parts_of_searched_word = []
     patterns_of_searched_words = []
     matched_users = []
-    flag = False
+    string_result =''
+    flag = 0
 
     parts_of_searched_word = re.split(r'; |, |\*|\n|_|\.|@|!|#|\$|%|\^|&|\(|-\)|\+|=|"|;|:|<|>|\?|~', searched_word)
 
@@ -42,7 +43,7 @@ def search(request):
     for user in Users.objects.all():
         if searched_word == user.username:
             string_result = user.username
-            flag = True
+            flag = 1
         else:
             continue
 
@@ -50,9 +51,14 @@ def search(request):
         for user in Users.objects.all():
             if re.search(word_pat, user.username) != None and user.username not in matched_users:
                 matched_users.append(user.username)
+                flag = 2
 
-    if flag == False:
+    if flag == 2:
         string_result = '~'.join(matched_users)
+    elif flag == 0:
+        string_result = 'No Match Found'
+
+
     return HttpResponse(string_result)
 
 
