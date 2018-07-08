@@ -53,7 +53,7 @@ def search(request):
 
     if flag == False:
         string_result = '~'.join(matched_users)
-    return Response(string_result)
+    return HttpResponse(string_result)
 
 
 
