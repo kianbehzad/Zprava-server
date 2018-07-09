@@ -38,7 +38,7 @@ def getallchats(request):
         for x in chat.chat_text_messages.all():
             serializer = TextMessageSerializer(x, many=False)
             dict[x.pk] = serializer.data
-        data[chat.first_side.username] = dict
+        data[chat.second_side.username] = dict
         has_any_message = True
     if not has_any_message:
         return HttpResponse('EmptyMessages')
@@ -83,7 +83,7 @@ def getnewchats(request):
             for x in new_messages:
                 serializer = TextMessageSerializer(x, many=False)
                 dict[x.pk] = serializer.data
-            data[chat.first_side.username] = dict
+            data[chat.second_side.username] = dict
         has_any_message = True
     if not has_any_message:
         return HttpResponse('EmptyMessages')
@@ -159,6 +159,68 @@ def seen(request):
     return HttpResponse('Seen')
 
 
+@api_view(['GET', 'POST', ])
+def getmessage(request):
+    first = request.GET.get("firstside")
+    second = request.GET.get("secondside")
+    pk = request.GET.get("pk")
+    chat = None
+    is_chat_exists = False
+    for _chat in Chat.objects.all():
+        if _chat.first_side.username == first and _chat.second_side.username == second:
+            chat = _chat
+            is_chat_exists = True
+        if _chat.first_side.username == second and _chat.second_side.username == first:
+            chat = _chat
+            is_chat_exists = True
+    if not is_chat_exists:
+        return HttpResponse('InvalidChat')
+    ##else
+    message = None
+    is_message_exists = False
+    for textmessage in chat.chat_text_messages.all():
+        if textmessage.pk == int(pk):
+            message = textmessage
+            is_message_exists = True
+    if not is_message_exists:
+        return HttpResponse('InvalidPK')
+    ##else
+    serializer = TextMessageSerializer(message, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET', 'POST', ])
+def chatheaders(request):
+    username = request.GET.get("username")
+    user = None
+    is_exist = False
+    for _user in Users.objects.all():
+        if _user.username == username:
+            is_exist = True
+            user = _user
+    if not is_exist:
+        return HttpResponse('InvalidUserName')
+    data = {}
+    has_any_message = False
+    for chat in user.second_side_chats.all():
+        data[chat.first_side.username] = {}
+        for x in chat.chat_text_messages.all():
+            has_any_message = True
+            amIpublisher = False
+            if x.publisher.username == user.username:
+                amIpublisher = True
+            data[chat.first_side.username][x.pk] = amIpublisher
+    for chat in user.first_side_chats.all():
+        data[chat.second_side.username] = {}
+        for x in chat.chat_text_messages.all():
+            has_any_message = True
+            amIpublisher = False
+            if x.publisher.username == user.username:
+                amIpublisher = True
+            data[chat.second_side.username][x.pk] = amIpublisher
+    if not has_any_message:
+        return HttpResponse('EmptyMessages')
+    return Response(data)
 
 
 

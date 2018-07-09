@@ -9,6 +9,9 @@ urlpatterns = [
     path('getnewchats/', views.getnewchats, name='getnewchats'),
     path('newtextmessage/', views.newtextmessage, name='newtextmessage'),
     path('seen/', views.seen, name='seen'),
+    ##new approach
+    path('getmessage/', views.getmessage, name='getmessage'),
+    path('chatheaders/', views.chatheaders, name='chatheaders'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
