@@ -66,25 +66,52 @@ def setting(request):
     new_username = request.GET.get('nusername')
     new_password = request.GET.get('npassword')
     username = request.GET.get('username')
-    is_exist = False
-    for user in Users.objects.all():
-        if username == user.username:
-            is_exist = True
+    just_pass_change = False
+    just_user_change = False
+    no_change = False
+    username_exist = False
 
-    if is_exist == False:
-        return HttpResponse('Username does not exist')
-    if new_username =='' or new_password =='':
-        return HttpResponse('Empty Field')
+    if username == new_username and not new_password == '':
+        just_pass_change = True
+
+    if new_password == '' and not username == new_username:
+        just_user_change = True
+
+    if new_username == username and new_password == '':
+        no_change = True
+
+    if no_change == True:
+         return HttpResponse('NoChange')
+
     for user in Users.objects.all():
         if user.username == new_username:
-            return HttpResponse("Username Is Taken")
+            username_exist = True
 
-    for user in Users.objects.all():
-        if user.username == username:
-            user.username = new_username
-            user.password = new_password
-            user.save()
-            return HttpResponse("Username Changed Successfully")
+    if new_username == '':
+        return HttpResponse('Empty')
+    if username_exist and not just_pass_change:
+        return HttpResponse('Taken')
+
+    if just_pass_change and not just_user_change :
+        for user in Users.objects.all():
+            if user.username == username:
+                user.password = new_password
+                user.save()
+                return HttpResponse('Pass')
+    elif just_user_change and not just_pass_change:
+        for user in Users.objects.all():
+            if user.username == username:
+                user.username = new_username
+                user.save()
+                return HttpResponse('User')
+    elif not just_pass_change and not just_user_change:
+        for user in Users.objects.all():
+            if user.username == username:
+                user.username = new_username
+                user.save()
+                user.password = new_password
+                user.save()
+                return HttpResponse('PassUser')
 
 
 
