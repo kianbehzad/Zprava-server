@@ -62,5 +62,29 @@ def verification(request):
     else:
         return HttpResponse("Enter")
 
+def setting(request):
+    new_username = request.GET.get('nusername')
+    new_password = request.GET.get('npassword')
+    username = request.GET.get('username')
+    is_exist = False
+    for user in Users.objects.all():
+        if username == user.username:
+            is_exist = True
+
+    if is_exist == False:
+        return HttpResponse('Username does not exist')
+    if new_username =='' or new_password =='':
+        return HttpResponse('Empty Field')
+    for user in Users.objects.all():
+        if user.username == new_username:
+            return HttpResponse("Username Is Taken")
+
+    for user in Users.objects.all():
+        if user.username == username:
+            user.username = new_username
+            user.password = new_password
+            user.save()
+            return HttpResponse("Username Changed Successfully")
+
 
 
