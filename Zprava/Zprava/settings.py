@@ -117,10 +117,10 @@ USE_L10N = True
 USE_TZ = True
 
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'ir-hs01.serversgig.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'kian.behzad@gmail.com'
-EMAIL_HOST_PASSWORD = 'STREET11'
+EMAIL_HOST_USER = 'community@zprava.ir'
+EMAIL_HOST_PASSWORD = 'STREETbz11'
 
 
 # Static files (CSS, JavaScript, Images)

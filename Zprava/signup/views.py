@@ -33,7 +33,7 @@ def registration(request):
         send_mail(
             'Zprava Verification Code',
             'you Zprava verification code is: '+ str(verification_code),
-            'kian.behzad@gmail.com',
+            'community@zprava.ir',
             [user.email],
             fail_silently=True,
         )
