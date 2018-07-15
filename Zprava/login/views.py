@@ -41,7 +41,7 @@ def forget(request):
             send_mail(
                 'Zprava Restore Your Data',
                 'your Zprava username is: ' + user.username + '    -    and your password is: ' + user.password,
-                'kian.behzad@gmail.com',
+                'community@zprava.ir',
                 [user.email],
                 fail_silently=False,
             )
