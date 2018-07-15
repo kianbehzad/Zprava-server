@@ -15,6 +15,8 @@ class Chat(models.Model):
 class TextMessage(models.Model):
     publisher = models.ForeignKey(Users, related_name="published_text_messages", null=True, on_delete=models.CASCADE)
     subscriber = models.ForeignKey(Users, related_name="subscribed_text_messages", null=True, on_delete=models.CASCADE)
+    origin_publisher = models.ForeignKey(Users, related_name="origin_published_text_messages", null=True, on_delete=models.CASCADE)
+    is_forward = models.BooleanField(default=False)
     chat = models.ForeignKey(Chat, related_name="chat_text_messages", null=True, on_delete=models.CASCADE)
     is_seen = models.BooleanField(default=False)
     datetime = models.CharField(max_length=50, null=True)
