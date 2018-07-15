@@ -96,11 +96,15 @@ def getnewchats(request):
 def newtextmessage(request):
     publisher = request.GET.get("publisher")
     subscriber = request.GET.get("subscriber")
+    origin_publisher = request.GET.get("origin_publisher")
     textmessage = request.GET.get("textmessage")
     user_publisher = None
     user_subscriber = None
+    user_origin_publisher = None
     is_publisher_exist = False
     is_subscriber_exists = False
+    is_forward = False
+    is_origin_publisher_exists = False
     for _user in Users.objects.all():
         if _user.username == publisher:
             is_publisher_exist = True
@@ -108,12 +112,22 @@ def newtextmessage(request):
         if _user.username == subscriber:
             is_subscriber_exists = True
             user_subscriber = _user
-    if not is_publisher_exist and not is_publisher_exist:
-        return HttpResponse('InvalidPublisherSubscriber')
+    if origin_publisher == None:
+        is_forward = False
+    else:
+        is_forward = True
+        for _user in Users.objects.all():
+            if _user.username == origin_publisher:
+                is_origin_publisher_exists = True
+                user_origin_publisher = _user
+    if not is_publisher_exist and not is_publisher_exist and not is_origin_publisher_exists:
+        return HttpResponse('InvalidPublisherSubscriberOrigin')
     if not is_publisher_exist:
         return HttpResponse('InvalidPublisher')
     if not is_subscriber_exists:
         return HttpResponse('InvalidSubscriber')
+    if not is_origin_publisher_exists and is_forward:
+        return HttpResponse('InvalidOriginPublisher')
     chat = None
     chat_exist = False
     for _chat in Chat.objects.all():
@@ -129,6 +143,11 @@ def newtextmessage(request):
         chat = Chat(first_side=user_publisher, second_side=user_subscriber)
         chat.save()
     textmessage = TextMessage(publisher = user_publisher, subscriber = user_subscriber, chat = chat, text = textmessage, is_seen = False, datetime = datetime.datetime.now(), type="TEXT")
+    if is_forward:
+        textmessage.origin_publisher = user_origin_publisher
+        textmessage.is_forward = True
+    else:
+        textmessage.is_forward = False
     user_publisher.last_message_datetime = textmessage.datetime
     textmessage.save()
     user_publisher.save()
