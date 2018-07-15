@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from .models import Users
 import random
+import datetime
+
 
 # Create your views here.
 
@@ -27,7 +29,7 @@ def registration(request):
         return HttpResponse("EmailExist")
     else:
         verification_code = random.randint(10000, 99999)
-        user = Users(username=username, password=password, email=email, verification_code=verification_code, is_verified=False)
+        user = Users(username=username, password=password, email=email, verification_code=verification_code, is_verified=False, last_message_datetime=datetime.datetime.now())
         send_mail(
             'Zprava Verification Code',
             'you Zprava verification code is: '+ str(verification_code),
