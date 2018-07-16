@@ -228,7 +228,7 @@ def chatheaders(request):
             amIpublisher = False
             if x.publisher.username == user.username:
                 amIpublisher = True
-            data[chat.first_side.username][x.pk] = {"amIpublisher":amIpublisher,"type": x.type}
+            data[chat.first_side.username][x.pk] = {"amIpublisher":amIpublisher,"type": x.type, "is__seen": x.is_seen*1}
     for chat in user.first_side_chats.all():
         data[chat.second_side.username] = {}
         for x in chat.chat_text_messages.all():
@@ -236,7 +236,7 @@ def chatheaders(request):
             amIpublisher = False
             if x.publisher.username == user.username:
                 amIpublisher = True
-            data[chat.second_side.username][x.pk] = {"amIpublisher":amIpublisher,"type": x.type}
+            data[chat.second_side.username][x.pk] = {"amIpublisher":amIpublisher,"type": x.type, "is__seen": x.is_seen*1}
     if not has_any_message:
         return HttpResponse('EmptyMessages')
     return Response(data)
