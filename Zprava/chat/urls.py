@@ -9,6 +9,7 @@ urlpatterns = [
     path('getnewchats/', views.getnewchats, name='getnewchats'),
     path('newtextmessage/', views.newtextmessage, name='newtextmessage'),
     path('seen/', views.seen, name='seen'),
+    path('deletemessage/', views.deletemessage, name='deletemessage'),
     ##new approach
     path('getmessage/', views.getmessage, name='getmessage'),
     path('chatheaders/', views.chatheaders, name='chatheaders'),

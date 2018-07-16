@@ -241,7 +241,18 @@ def chatheaders(request):
         return HttpResponse('EmptyMessages')
     return Response(data)
 
-
+def deletemessage(request):
+    pk = request.GET.get("pk")
+    message_exist = False
+    message = None
+    for msg in TextMessage.objects.all():
+        if str(msg.pk) == pk:
+            message_exist = True
+            message = msg
+    if not message_exist:
+        return HttpResponse('InvalidMessages')
+    #else
+    message.delete()
 
 
 
