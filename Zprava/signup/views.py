@@ -82,7 +82,7 @@ def changeusername(request):
 
     old_user.username = new_username
     old_user.save()
-    return HttpResponse("UsernameChanged")
+    return HttpResponse(new_username)
 
 
 
