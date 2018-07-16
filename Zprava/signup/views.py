@@ -65,4 +65,41 @@ def verification(request):
         return HttpResponse("Enter")
 
 
+def changeusername(request):
+    old_username = request.GET.get("old_username")
+    new_username = request.GET.get("new_username")
+    old_username_exist = False
+    old_user = None
+    for user in Users.objects.all():
+        if user.username == old_username:
+            old_username_exist = True
+            old_user = user
+    for user in Users.objects.all():
+        if user.username == new_username:
+            return HttpResponse("UsernameTaken")
+    if not old_username_exist:
+        return HttpResponse("InvalidUsername")
 
+    old_user.username = new_username
+    old_user.save()
+    return HttpResponse("UsernameChanged")
+
+
+
+def changepassword(request):
+    username = request.GET.get("username")
+    old_password = request.GET.get("old_password")
+    new_password = request.GET.get("new_password")
+    username_exist = False
+    user = None
+    for _user in Users.objects.all():
+        if _user.username == username:
+            username_exist = True
+            user = _user
+    if not username_exist:
+        return HttpResponse("InvalidUsername")
+    if not user.password == old_password:
+        return HttpResponse("IncorrectPassword")
+    user.password = new_password
+    user.save()
+    return HttpResponse("PasswordChanged")
