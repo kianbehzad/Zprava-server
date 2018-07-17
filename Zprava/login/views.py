@@ -21,7 +21,7 @@ def login(request):
                 is_verified = True
             if user.password == password:
                 correct_password = True
-
+# handle others
     if not username_exist:
         return HttpResponse("InvalidUsername")
     elif not is_verified:
