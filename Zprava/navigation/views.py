@@ -37,7 +37,7 @@ def search(request):
     parts_of_searched_word = re.split(r'; |, |\*|\n|_|\.|@|!|#|\$|%|\^|&|\(|-\)|\+|=|"|;|:|<|>|\?|~', searched_word)
 
     for word in parts_of_searched_word:
-        patterns_of_searched_words.append(re.compile(word))
+        patterns_of_searched_words.append(re.compile(word, re.IGNORECASE))
 
 
     for user in Users.objects.all():
